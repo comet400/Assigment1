@@ -141,3 +141,170 @@ int main(void)
 
     return 0;
 }
+
+// Function to create a new node
+FlightNode* createNode(const char* destination, const char* date, float farePrice)
+{
+    if (destination == NULL || date == NULL) return NULL;
+    if (destination[0] == '\0' || date[0] == '\0') return NULL;
+
+    FlightNode* newNode = (FlightNode*)malloc(sizeof(FlightNode));
+    if (!newNode) return NULL;
+
+    newNode->destination = (char*)malloc((strlen(destination) + 1) * sizeof(char));
+    newNode->date = (char*)malloc((strlen(date) + 1) * sizeof(char));
+
+    if (!newNode->destination || !newNode->date) {
+        free(newNode->destination);
+        free(newNode->date);
+        free(newNode);
+        return NULL;
+    }
+
+    strcpy(newNode->destination, destination);
+    strcpy(newNode->date, date);
+    newNode->farePrice = farePrice;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+
+    return newNode;
+}
+
+// Function to insert a node into a sorted doubly linked list by fare
+void insertSortedByFare(FlightNode** head, FlightNode** tail, FlightNode* newNode)
+{
+    if (*head == NULL)
+    {
+        *head = *tail = newNode;
+        return;
+    }
+
+    FlightNode* current = *head;
+    while (current != NULL && current->farePrice < newNode->farePrice) {
+        current = current->next;
+    }
+
+    if (current == *head)
+    {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+    else if (current == NULL)
+    {
+        (*tail)->next = newNode;
+        newNode->prev = *tail;
+        *tail = newNode;
+    }
+    else
+    {
+        newNode->next = current;
+        newNode->prev = current->prev;
+        current->prev->next = newNode;
+        current->prev = newNode;
+    }
+}
+
+// Function to insert a node into a sorted doubly linked list by destination
+void insertSortedByDestination(FlightNode** head, FlightNode** tail, FlightNode* newNode)
+{
+    if (*head == NULL)
+    {
+        *head = *tail = newNode;
+        return;
+    }
+
+    FlightNode* current = *head;
+    while (current != NULL && strcmp(current->destination, newNode->destination) < 0)
+    {
+        current = current->next;
+    }
+
+    if (current == *head)
+    {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+    else if (current == NULL)
+    {
+        (*tail)->next = newNode;
+        newNode->prev = *tail;
+        *tail = newNode;
+    }
+    else
+    {
+        newNode->next = current;
+        newNode->prev = current->prev;
+        current->prev->next = newNode;
+        current->prev = newNode;
+    }
+}
+
+// Function to find a flight node by destination and date
+FlightNode* findFlight(FlightNode* head, const char* destination, const char* date)
+{
+    while (head != NULL)
+    {
+        if (strcmp(head->destination, destination) == 0 && strcmp(head->date, date) == 0) 
+        {
+            return head;
+        }
+        head = head->next;
+    }
+    return NULL;
+}
+
+// Function to delete a node from a doubly linked list
+void deleteNode(FlightNode* node, FlightNode** head, FlightNode** tail)
+{
+    if (node == NULL) return;
+
+    if (node == *head) {
+        *head = node->next;
+        if (*head != NULL) {
+            (*head)->prev = NULL;
+        }
+        else {
+            *tail = NULL;
+        }
+    }
+    else if (node == *tail) {
+        *tail = node->prev;
+        if (*tail != NULL) {
+            (*tail)->next = NULL;
+        }
+        else {
+            *head = NULL;
+        }
+    }
+    else {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+    free(node->destination);
+    free(node->date);
+    free(node);
+}
+
+// Function to print the flight list
+void printFlightList(const FlightNode* head)
+{
+    while (head != NULL) {
+        printf("%-35s %-35s %-10.2f\n", head->destination, head->date, head->farePrice);
+        head = head->next;
+    }
+}
+
+// Function to free the entire list
+void freeFlightList(FlightNode* head)
+{
+    while (head != NULL)
+    {
+        FlightNode* temp = head;
+        head = head->next;
+        free(temp->destination);
+        free(temp->date);
+        free(temp);
+    }
+}
