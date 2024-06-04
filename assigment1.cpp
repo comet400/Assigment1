@@ -101,7 +101,7 @@ int main(void)
     searchDate[strcspn(searchDate, "\n")] = 0;
 
     FlightNode* foundFlight = findFlight(destHead, searchDest, searchDate);
-    if (foundFlight) 
+    if (foundFlight)
     {
         printf("Flight found with fare: %.2f\n", foundFlight->farePrice);
         printf("Enter new fare (or the same fare to keep it): ");
@@ -154,7 +154,8 @@ FlightNode* createNode(const char* destination, const char* date, float farePric
     newNode->destination = (char*)malloc((strlen(destination) + 1) * sizeof(char));
     newNode->date = (char*)malloc((strlen(date) + 1) * sizeof(char));
 
-    if (!newNode->destination || !newNode->date) {
+    if (!newNode->destination || !newNode->date)
+    {
         free(newNode->destination);
         free(newNode->date);
         free(newNode);
@@ -180,7 +181,8 @@ void insertSortedByFare(FlightNode** head, FlightNode** tail, FlightNode* newNod
     }
 
     FlightNode* current = *head;
-    while (current != NULL && current->farePrice < newNode->farePrice) {
+    while (current != NULL && current->farePrice < newNode->farePrice)
+    {
         current = current->next;
     }
 
@@ -246,7 +248,7 @@ FlightNode* findFlight(FlightNode* head, const char* destination, const char* da
 {
     while (head != NULL)
     {
-        if (strcmp(head->destination, destination) == 0 && strcmp(head->date, date) == 0) 
+        if (strcmp(head->destination, destination) == 0 && strcmp(head->date, date) == 0)
         {
             return head;
         }
@@ -260,27 +262,37 @@ void deleteNode(FlightNode* node, FlightNode** head, FlightNode** tail)
 {
     if (node == NULL) return;
 
-    if (node == *head) {
+    if (node == *head)
+    {
         *head = node->next;
-        if (*head != NULL) {
+        if (*head != NULL)
+        {
             (*head)->prev = NULL;
         }
         else {
             *tail = NULL;
         }
     }
-    else if (node == *tail) {
+    else if (node == *tail)
+    {
         *tail = node->prev;
-        if (*tail != NULL) {
+        if (*tail != NULL)
+        {
             (*tail)->next = NULL;
         }
-        else {
+        else
+        {
             *head = NULL;
         }
     }
-    else {
-        node->prev->next = node->next;
-        node->next->prev = node->prev;
+    else
+    {
+        if (node->prev != NULL) {
+            node->prev->next = node->next;
+        }
+        if (node->next != NULL) {
+            node->next->prev = node->prev;
+        }
     }
     free(node->destination);
     free(node->date);
